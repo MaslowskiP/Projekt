@@ -30,15 +30,30 @@
 			<p>
 
 			<!-- przykładowa lista produktów -->
-			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-notext ui-btn-inline" >Zdjęcie</a> <a href="#" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-notext ui-btn-inline">Wiadomość</a> <hr>
-			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-notext ui-btn-inline" >Zdjęcie</a> <a href="#" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-notext ui-btn-inline">Wiadomość</a> <hr>
-			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-notext ui-btn-inline" >Zdjęcie</a> <a href="#" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-notext ui-btn-inline">Wiadomość</a> <hr>
-			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-notext ui-btn-inline" >Zdjęcie</a> <a href="#" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-notext ui-btn-inline">Wiadomość</a> <hr>
+			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
+			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
+			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
+			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
+			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
 		
 
 			<div data-role="popup" id="okladka">
-			      <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a>
+			    <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a>
 				<img src="https://www.previewsworld.com/SiteImage/CatalogImage/STL040589?type=1" style="width:400px;height:600px;" alt="ALL STAR BATMAN #9">
+			</div>
+			<div data-role="popup" id="wiadomosc">
+			    <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a>
+						<form method="post" action="jakasfunkcja">
+							<fieldset class="ui-field-contain">
+								<label for="message">Wybierz komentarz</label>
+									<select name="message" id="message">
+										<option value="1">Ostatnia sztuka produktu</option>
+										<option value="2">Brak produktu</option>
+										<option value="3">Produkt uszkodzony</option>
+									</select>
+							</fieldset>
+						<input type="submit" data-inline="true" value="Dodaj komentarz">
+						</form>
 			</div>
 			
 			</p>

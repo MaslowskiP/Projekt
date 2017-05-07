@@ -21,8 +21,8 @@
 		
 		  <div data-role="header">
 			<h1>Lista produktów</h1>
-			<button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" >Zaczytaj listę</button>
-			<a href="#opcje" class="ui-btn ui-icon-bars ui-btn-icon-left">Opcje</a>
+			<button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" id="zaczytaj">Zaczytaj listę</button>
+			<a href="#opcje" class="ui-btn ui-icon-bars ui-btn-icon-left" >Opcje</a>
 		  </div>
 		  
 	  
@@ -32,18 +32,40 @@
 			
 			<div id="lista"></div>
 			<script type = "text/javascript" language = "javascript">
-
-			$('#lista').append("testuje");
+			dodaj('ALL STAR BATMAN #11', 'NOV169205');
 			
-			var kod = "NOV169203";
+			$(document).ready(function() {
+				$("#zaczytaj").click(function(event){
+				
+				
+				dodaj('ALL STAR BATMAN #11', 'NOV169205');
+				
+				});
+			});
+			
+			
+			function dodaj (nazwa, kod) {
+			
+			<!-- tutaj funkcja do dodawania komiskow -->
+			
+			$('#lista').append('<div data-role="popup" id="'+kod+'"></div>');
+			
+			//var kod = "NOV169204";
 			var id = "#"+kod;
+			
 			var link = "https://query.yahooapis.com/v1/public/yql?q=select+src+from+html+where+url%3D%22https%3A%2F%2Fpreviewsworld.com%2FCatalog%2F"+kod+"%22+and%0A++++++xpath%3D%27%2F%2Fdiv%2Fa%2Fimg%27+LIMIT+1&format=json";
 			   
-			   			   			      $.getJSON(link, function(jd3) {
-                  $(id).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd3.query.results.img.src+'" style="width:400px;height:600px;" alt="ALL STAR BATMAN #9">');
-				  
-
+			$.getJSON(link, function(jd) {
+                  $(id).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd.query.results.img.src+'" style="width:400px;height:600px;" alt="'+kod+'">');
                });
+			
+			
+			$('#lista').append(nazwa + '<a href="#'+kod+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>');
+			
+
+			}
+			
+			
 			
 			
 			
@@ -59,7 +81,7 @@
 			ALL STAR BATMAN #9 <a href="#okladka" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" >Produkt znaleziono</button><hr>
 		
 
-			<div data-role="popup" id="NOV169203">
+			<div data-role="popup" id="NOV169204">
 			    <!-- <a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a> -->
 				<!-- <img src="https://www.previewsworld.com/SiteImage/CatalogImage/STL040589?type=1" style="width:400px;height:600px;" alt="ALL STAR BATMAN #9"> -->
 			</div>

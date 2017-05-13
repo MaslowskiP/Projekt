@@ -32,8 +32,11 @@
 			
 			<div id="lista"></div>
 			<script type = "text/javascript" language = "javascript">
-			dodaj('ALL STAR BATMAN #11', 'NOV169205');
-			
+			//dodaj('ALL STAR BATMAN #11', 'NOV169205');
+			przygotujObrazki();
+			pobierzListe();
+
+
 			$(document).ready(function() {
 				$("#zaczytaj").click(function(event){
 				
@@ -43,6 +46,39 @@
 				});
 			});
 			
+			
+			function przygotujObrazki() {
+			
+				
+			
+			}
+			
+			
+			function pobierzListe() {
+			
+			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
+			var zawartosc;
+			var kod;
+			
+			$.getJSON(lista , function(jd2) {
+			
+				//$('#lista').append(jd2.query.results.body);
+				zawartosc = jd2.query.results.body;
+				zawartosc = zawartosc.split('\n');
+				for (i = 0; i < zawartosc.length; i++) {
+					kod = zawartosc[i].split(';');
+					$('#lista').append(kod[1] + "<br>");
+				}
+				
+
+			
+			});
+			
+			
+			
+			}
+			
+
 			
 			function dodaj (nazwa, kod) {
 			

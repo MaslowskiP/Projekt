@@ -37,44 +37,25 @@
 			db.transaction(function (tx) {
 				
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
-				tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (0, "ALL STAR BATMAN #10", "MAR170261", 0)');
-				tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (1, "DETECTIVE COMICS #956", "MAR170284", 0)');
-				tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (2, "SECRET WARRIORS #1", "MAR170931", 1)');
-				
+				//tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (0, "ALL STAR BATMAN #10", "MAR170261", 0)'); //do testów
 			});
 
-			
-			
-         db.transaction(function (tx) {
-		 
-            tx.executeSql('SELECT * FROM COMICS', [], function (tx, results) {
-			
-				var dlugosc = results.rows.length, i;
-				
-				$('#lista').append('Znaleziono taka ilość wpisów: ' + dlugosc + '<br>');
-					
-               for (i = 0; i < dlugosc; i++){
-					$('#lista').append(results.rows.item(i).name + ' ' + results.rows.item(i).code + '<br>');
-               }
-            }, null);
-			
-			//tx.executeSql('DROP TABLE IF EXISTS COMICS');
-         });
-		 
+
 		 db.transaction(function (tx) {
 		 
             tx.executeSql('SELECT * FROM COMICS WHERE status=0', [], function (tx, results) {
 			
-				var dlugosc = results.rows.length, i;
+				var dlugosc = results.rows.length, y;
 				
-				$('#lista').append('Znaleziono taka ilość wpisów: ' + dlugosc + '<br>');
+				//$('#lista').append('Znaleziono taka ilość wpisów: ' + dlugosc + '<br>'); // do testów
 					
-               for (i = 0; i < dlugosc; i++){
-					$('#lista').append(results.rows.item(i).name + ' ' + results.rows.item(i).code + '<br>');
+               for (y = 0; y < dlugosc; y++){
+					//$('#lista').append(results.rows.item(y).name + ' ' + results.rows.item(y).code + ' ' + results.rows.item(y).id +'<br>'); //tylko do testrów
+					dodaj(results.rows.item(y).name, results.rows.item(y).code, results.rows.item(y).id)
                }
             }, null);
 			
-			//tx.executeSql('DROP TABLE IF EXISTS COMICS');
+			//tx.executeSql('DROP TABLE IF EXISTS COMICS'); // do testów 
          });
 			
 			
@@ -99,7 +80,14 @@
 			
 			function pobierzListe() {
 			
+			//najpierw obsługa bazy danych - usuwa tabelę a następnie ją tworzy (poprostu czyści tabelę ze starej listy produktów)
+			db.transaction(function (tx) {
 			
+				tx.executeSql('DROP TABLE IF EXISTS COMICS');
+				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
+				
+			});
+			//reszta funkcji pobierająca liste komiksów
 			
 			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
 			var zawartosc;
@@ -109,11 +97,16 @@
 			
 				zawartosc = jd2.query.results.body;
 				zawartosc = zawartosc.split('\n');
+
+				db.transaction(function (tx) {	// funkcja z bazą danych musi się zaczynać tutaj bo inaczej nie działa patrz tutaj: http://stackoverflow.com/questions/12586367/only-the-last-run-in-a-for-loop-in-javascript-works
 				for (i = 0; i < zawartosc.length; i++) {
 					kod = zawartosc[i].split(';');
 					dodaj (kod[0], kod[1], i);
-				}
+					
+						tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
 
+					}
+				});
 			});
 			
 			}

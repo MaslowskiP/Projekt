@@ -69,7 +69,15 @@
 				});
 				$("#form").submit(function(e) {
 					e.preventDefault();
-					$('#lista').html("<br />$('#form').serialize():<br />"+ $('#form').serialize());
+					//$('#lista').html("<br />$('#form').serialize():<br />"+ $('#form').serialize());
+					var wynik = $('#form').serialize();
+
+					wynik = wynik.split('&');
+					var wiadomosc = wynik[0].split("=").pop();
+					var numer = wynik[1].split("=").pop();
+					//$('#lista').html(wiadomosc +"bang" + numer);
+					$("#komiks_" + numer).html("");
+					usun(numer);
 					//$("#wiadomosc").html("");//usuwa okno
 				});
 			});
@@ -80,18 +88,29 @@
 			//$('#lista').html("<br />$('form').serialize():<br />"+ $('form').serialize());
 			//var data = $('form').serialize();
 			
+			function kasuj(numer, wiadomosc) {
+			
+
+				db.transaction(function (tx) {
+			
+					tx.executeSql('UPDATE COMICS SET status=? WHERE id=?',  [wiadomosc, numer]);
+				
+				});
+
+			}		
+
+		
+			
 			
 			function usun(id) {
 			
 				$("#komiks_" + id).html("");
 				db.transaction(function (tx) {
 			
-					tx.executeSql('UPDATE COMICS SET status=1 WHERE id=?', [id]);
+					tx.executeSql('UPDATE COMICS SET status=1 WHERE id=?',  [id]);
 				
 				});
-				
-				
-				
+
 			}
 			
 			
@@ -165,10 +184,10 @@
 								<label for="message">Wybierz komentarz</label>
 									<select name="message" id="message">
 										<option value="2">Ostatnia sztuka produktu</option>
-										<option value="0">Brak produktu</option>
+										<option value="1">Brak produktu</option>
 										<option value="3">Produkt uszkodzony</option>
 									</select>
-							
+						<input type="hidden" name="nr" value="0">	
 						<input type="submit" data-inline="true" value="Dodaj komentarz" a href="#pageone">
 						</form>
 			</div>

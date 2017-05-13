@@ -74,6 +74,13 @@
 			function usun(id) {
 			
 				$("#komiks_" + id).html("");
+				db.transaction(function (tx) {
+			
+					tx.executeSql('UPDATE COMICS SET status=1 WHERE id=?', [id]);
+				
+				});
+				
+				
 				
 			}
 			

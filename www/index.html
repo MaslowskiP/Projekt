@@ -21,7 +21,7 @@
 		
 		  <div data-role="header">
 			<h1>Lista produktów</h1>
-			<button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" id="zaczytaj">Zaczytaj listę</button>
+			
 		  </div>
 		  
 	  
@@ -108,9 +108,10 @@
 			
 			//najpierw obsługa bazy danych - usuwa tabelę a następnie ją tworzy (poprostu czyści tabelę ze starej listy produktów)
 			db.transaction(function (tx) {
-			
+				$('#lista').html("TEST2");
 				tx.executeSql('DROP TABLE IF EXISTS COMICS');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
+				$('#lista').html("TEST3");
 				
 			});
 			//reszta funkcji pobierająca liste komiksów
@@ -170,8 +171,8 @@
 			</p>
 		  </div>
 		  <div data-role="footer" data-position="fixed">
-			<!-- <h1>(c) Piotr Masłowski, Adrian Myszor</h1> -->
-			<button class="ui-btn ui-icon-mail ui-btn-icon-left">Wyślij raport</button>
+			<!-- <h1>(c) Piotr Masłowski, Adrian Myszor</h1> --><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" id="zaczytaj">Zaczytaj listę</button>
+			<button class="ui-btn ui-icon-mail ui-btn-icon-left ui-btn-right">Wyślij raport</button>
 		  </div> 
 		</div> 
 		

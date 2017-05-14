@@ -69,7 +69,7 @@
 				});
 				$("#form").submit(function(e) {
 					e.preventDefault();
-					//$('#lista').html("<br />$('#form').serialize():<br />"+ $('#form').serialize());
+					$('#lista').html("<br />$('#form').serialize():<br />"+ $('#form').serialize());
 					var wynik = $('#form').serialize();
 
 					wynik = wynik.split('&');
@@ -80,7 +80,7 @@
 					//$('#lista').html(wiadomosc +"bang" + numer);
 					$("#komiks_" + numer).html("");
 					kasuj(test, test2);
-					$("#wiadomosc").html("");//usuwa okno
+					$("#wiadomosc_" + numer).html("");//usuwa okno
 				});
 			});
 			
@@ -92,10 +92,12 @@
 			
 			function kasuj(numer, wiadomosc) {
 			
-
+				$("#komiks_" + numer).html("");
+				var test = parseInt(numer); //id produktu
+				var test2 = parseInt(wiadomosc); //status
 				db.transaction(function (tx) {
 			
-					tx.executeSql('UPDATE COMICS SET status=? WHERE id=?',  [wiadomosc, numer]);
+					tx.executeSql('UPDATE COMICS SET status=? WHERE id=?',  [test2, test]);
 				
 				});
 
@@ -163,7 +165,9 @@
                }); //dodawanie obrazka
 			
 			
-			$('#komiks_' + num).html(nazwa + '<a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a> <a href="#wiadomosc" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-comment ui-btn-icon-left ui-btn-inline">Wiadomość</a> <button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Produkt znaleziono</button><hr>'); //dodawanie komiksu
+			$('#komiks_' + num).html(nazwa + ' <a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a>  <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+',0)">Brak</button><button class="ui-btn ui-icon-shop ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 2)">Ostatni</button><button class="ui-btn ui-icon-alert ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 3)">Uszkodzony</button><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Znaleziono</button><hr>'); //dodawanie komiksu
+			
+			$('#wiadomosc_' + num).html('<a href="#pageone" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><form method="post" id="form"><label for="message">Wybierz komentarz</label><select name="message" id="message"><option value="2">Ostatnia sztuka produktu</option><option value="1">Brak produktu</option><option value="3">Produkt uszkodzony</option></select><input type="hidden" name="nr" value="'+num+'"><input type="submit" data-inline="true" value="Dodaj komentarz"></form>');// dodaje boxa z komentarzem
 			
 
 			}
@@ -190,7 +194,7 @@
 										<option value="3">Produkt uszkodzony</option>
 									</select>
 						<input type="hidden" name="nr" value="0">	
-						<input type="submit" data-inline="true" value="Dodaj komentarz" a href="#pageone">
+						<input type="submit" data-inline="true" value="Dodaj komentarz">
 						</form>
 			</div>
 			

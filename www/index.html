@@ -112,11 +112,7 @@
 				tx.executeSql('DROP TABLE IF EXISTS COMICS');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
 				$('#lista').html("TEST3");
-
-    });
-			//reszta funkcji pobierająca liste komiksów
-			
-			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
+							var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
 			var zawartosc;
 			var kod;
 			$('#lista').html(lista);
@@ -135,6 +131,11 @@
 					}
 				});
 			});
+
+    });
+			//reszta funkcji pobierająca liste komiksów
+			
+
 			
 			}
 			

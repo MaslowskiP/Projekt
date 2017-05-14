@@ -9,79 +9,55 @@
 		<script src="js/jquery.mobile-1.4.5.min.js"></script>
 		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
-		
 	</head>
 	<body onload="init()">
-		
-		
 		<div data-role="page" id="pageone">
-		
-
-
-		
-		  <div data-role="header">
-			<h1>Lista produktów</h1>
+			<div data-role="header">
+				<h1>Lista produktów</h1>
 			
-		  </div>
-		  
-	  
-		  <div data-role="main" class="ui-content">
+			</div>
+		<div data-role="main" class="ui-content">
 			<p>
-
-			
 			<div id="lista"></div>
 			<script type = "text/javascript" language = "javascript">
-
-
-			
-			document.addEventListener('deviceready', function () {
-				// cordova.plugins.email is now available
+			document.addEventListener('deviceready', function () { //aktywuje plugin z mailami
 			}, false);
-			
-			
-			var db = openDatabase('comiclist', '1.0', 'Baza z produktami', 2 * 1024 * 1024);
+
+			var db = openDatabase('comiclist', '1.0', 'Baza z produktami', 2 * 1024 * 1024); //tworzenie bazy danych
 			
 			db.transaction(function (tx) {
 				
-				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
-				//tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (0, "ALL STAR BATMAN #10", "MAR170261", 0)'); //do testów
+				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)'); //tworzy tabele jeżeli jej nie ma
+				
 			});
 
 
-		 db.transaction(function (tx) {
+			db.transaction(function (tx) { //poniższy kod sprawdza czy w bazie danych są już jakieś pozycje nieznalezione. Jeżeli są wyświetla ja
 		 
-            tx.executeSql('SELECT * FROM COMICS WHERE status=0', [], function (tx, results) {
+				tx.executeSql('SELECT * FROM COMICS WHERE status=0', [], function (tx, results) {//zapytanie do bazy danych
 			
 				var dlugosc = results.rows.length, y;
-				
-				//$('#lista').append('Znaleziono taka ilość wpisów: ' + dlugosc + '<br>'); // do testów
-					
-               for (y = 0; y < dlugosc; y++){
-					//$('#lista').append(results.rows.item(y).name + ' ' + results.rows.item(y).code + ' ' + results.rows.item(y).id +'<br>'); //tylko do testrów
-					dodaj(results.rows.item(y).name, results.rows.item(y).code, results.rows.item(y).id)
+
+				for (y = 0; y < dlugosc; y++){
+					dodaj(results.rows.item(y).name, results.rows.item(y).code, results.rows.item(y).id)//wyswietlenie produktów
                }
             }, null);
-			
-			//tx.executeSql('DROP TABLE IF EXISTS COMICS'); // do testów 
-         });
-			
-			
-			
-			$(document).ready(function() {
+
+			});
+
+			$(document).ready(function() {//obsługa przycisku do zaczytania listy
 				$("#zaczytaj").click(function(event){
 				pobierzListe();
 				});
-
 			});
 			
-
-			function raport() {
+			function raport() {//funkcja report() - jej zadanie jest stworzenie raportu końcowego oraz stworzenie maila
 				cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');//dodanie allisu bez tego nie można używać gmaila
 				//zmienne potrzebne do tworzenia maila
 				//pobieranie dzisiejszej daty
 				var dzis = new Date();
 				var dd = dzis.getDate();
-				var mm = dzis.getMonth()+1; //Styczeń jest jako 0 
+				var mm = dzis.getMonth()+1; //Styczeń jest jako 0 dlatego dodajem 1
 				var yyyy = dzis.getFullYear();
 
 				if(dd<10) {
@@ -94,54 +70,49 @@
 			
 				dzis = dd+'.'+mm+'.'+yyyy; //gotowa dzisiejsza data
 				
-				var odnalezione = '';
+				var odnalezione = '';//dzięki temu po ponowynym zaczytaniu funkcji te zmienne będą puste
 				var nieodnalezione = '';
 				var ostatnie = ''; 
 				var uszkodzone = '';
 				
 				db.transaction(function (tx) {
 				//tworzenie raportu na podstawie bazy danych najpierw komiksy/produkty znalezione
-				
-				
 		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=1', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							odnalezione = odnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
+							odnalezione = odnalezione + results.rows.item(y).code +'\t' + results.rows.item(y).name +'<br>';
 						}
 					}, null);
 				
 				//teraz zbieranie wszystkich komiksów nie znalezionych
 
-		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=0', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 						
 						for (y = 0; y < dlugosc; y++){
-							nieodnalezione = nieodnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
+							nieodnalezione = nieodnalezione + results.rows.item(y).code +'\t' + results.rows.item(y).name +'<br>';
 						}
 					}, null);
 			
 				//teraz zbieranie wszystkich ostatnich produktów 
 
-		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=2', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							ostatnie = ostatnie + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
+							ostatnie = ostatnie + results.rows.item(y).code +'\t' + results.rows.item(y).name +'<br>';
 						}
 					}, null);
 					
 				//teraz wszystkie uszkodzone
 
-		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=3', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							uszkodzone = uszkodzone + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
+							uszkodzone = uszkodzone + results.rows.item(y).code +'\t' + results.rows.item(y).name +'<br>';
 						}
 						var gotowyEmail = 'Znaleziono następujące produkty:<br><br>' + odnalezione + '<br>Produkty które nie zostały znalezione:<br><br>' + nieodnalezione + '<br>Produkty które się skończyły:<br><br>' + ostatnie + '<br>Produkty uszkodzone:<br><br>' + uszkodzone + '<br>Wygenerowano aplikacją ATOM';//musi być w tym miejscu inaczej nie ma synchronizacji
 	
@@ -160,13 +131,10 @@
 							body:    gotowyEmail
 						});
 					}, null);
-			
 				});
-	
 			}
 			
-			
-			function kasuj(numer, wiadomosc) {
+			function kasuj(numer, wiadomosc) {//funkcja usuwająca komiks po zamieszczeniu odpowiedniej wiadomośći
 			
 				$("#komiks_" + numer).html("");
 				var test = parseInt(numer); //id produktu
@@ -178,11 +146,8 @@
 				});
 
 			}		
-
-		
 			
-			
-			function usun(id) {
+			function usun(id) {//funkcja usuwa komiks po jego znalezieniu
 			
 				$("#komiks_" + id).html("");
 				db.transaction(function (tx) {
@@ -193,8 +158,7 @@
 
 			}
 			
-			
-			function pobierzListe() {
+			function pobierzListe() {//funkcja która pobiera listę produktów oraz ją odpowiednio obrabia
 			
 			//najpierw obsługa bazy danych - usuwa tabelę a następnie ją tworzy (poprostu czyści tabelę ze starej listy produktów)
 			db.transaction(function (tx) {
@@ -203,58 +167,47 @@
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
 
 
-    });
+			});
 			//reszta funkcji pobierająca liste komiksów
 			
-			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
+			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';//link do listy
 			var zawartosc;
 			var kod;
 			$.getJSON(lista , function(jd2) {
 			
-			zawartosc = jd2.query.results.body;
-			zawartosc = zawartosc.split('\n');
+				zawartosc = jd2.query.results.body;
+				zawartosc = zawartosc.split('\n');
 				
-			db.transaction(function (tx) {	// funkcja z bazą danych musi się zaczynać tutaj bo inaczej nie działa patrz tutaj: http://stackoverflow.com/questions/12586367/only-the-last-run-in-a-for-loop-in-javascript-works
-			for (i = 0; i < zawartosc.length; i++) {
-				kod = zawartosc[i].split(';');
-				dodaj (kod[0], kod[1], i);
-					tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
+				db.transaction(function (tx) {	// funkcja z bazą danych musi się zaczynać tutaj bo inaczej nie działa patrz tutaj: http://stackoverflow.com/questions/12586367/only-the-last-run-in-a-for-loop-in-javascript-works
+					for (i = 0; i < zawartosc.length; i++) {
+				
+						kod = zawartosc[i].split(';');
+						dodaj (kod[0], kod[1], i);
+						tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
 
-					}
+						}
+					});
 				});
-			});
-
-			
 			}
 			
+			function dodaj (nazwa, kod, num) {//funkcja dodaje produkty do listy oraz odszukuje odpowiedni obrazek 
 
+				var id = "#"+kod;
 			
-			function dodaj (nazwa, kod, num) {
-			
-
-			var id = "#"+kod;
-			
-			var link = "https://query.yahooapis.com/v1/public/yql?q=select+src+from+html+where+url%3D%22https%3A%2F%2Fpreviewsworld.com%2FCatalog%2F"+kod+"%22+and%0A++++++xpath%3D%27%2F%2Fdiv%2Fa%2Fimg%27+LIMIT+1&format=json";
+				var link = "https://query.yahooapis.com/v1/public/yql?q=select+src+from+html+where+url%3D%22https%3A%2F%2Fpreviewsworld.com%2FCatalog%2F"+kod+"%22+and%0A++++++xpath%3D%27%2F%2Fdiv%2Fa%2Fimg%27+LIMIT+1&format=json";
 			   
-			$.getJSON(link, function(jd) {
-                  $('#obrazek_' + num).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd.query.results.img.src+'" style="width:300px;height:400px;" alt="'+kod+'">');
-               }); //dodawanie obrazka
-			
-			
-			$('#komiks_' + num).html(nazwa + ' <a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a>  <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+',0)">Brak</button><button class="ui-btn ui-icon-shop ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 2)">Ostatni</button><button class="ui-btn ui-icon-alert ui-btn-icon-left  ui-btn-inline" onclick="kasuj('+num+', 3)">Uszkodzony</button><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Znaleziono</button><hr>'); //dodawanie komiksu
-			
-		
+				$.getJSON(link, function(jd) {
+					$('#obrazek_' + num).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd.query.results.img.src+'" style="width:300px;height:400px;" alt="'+kod+'">');
+				}); //dodawanie obrazka
+
+				$('#komiks_' + num).html(nazwa + ' <a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a>  <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+',0)">Brak</button><button class="ui-btn ui-icon-shop ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 2)">Ostatni</button><button class="ui-btn ui-icon-alert ui-btn-icon-left  ui-btn-inline" onclick="kasuj('+num+', 3)">Uszkodzony</button><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Znaleziono</button><hr>'); //dodawanie komiksu
 
 			}
-
 			
 			</script>
 			<div id="komiks_0"></div><div id="komiks_1"></div><div id="komiks_2"></div><div id="komiks_3"></div><div id="komiks_4"></div><div id="komiks_5"></div><div id="komiks_6"></div><div id="komiks_7"></div><div id="komiks_8"></div><div id="komiks_9"></div><div id="komiks_10"></div><div id="komiks_11"></div><div id="komiks_12"></div><div id="komiks_13"></div><div id="komiks_14"></div><div id="komiks_15"></div><div id="komiks_16"></div><div id="komiks_17"></div><div id="komiks_18"></div><div id="komiks_19"></div><div id="komiks_20"></div><div id="komiks_21"></div><div id="komiks_22"></div><div id="komiks_23"></div><div id="komiks_24"></div><div id="komiks_25"></div><div id="komiks_26"></div><div id="komiks_27"></div><div id="komiks_28"></div><div id="komiks_29"></div><div id="komiks_30"></div><div id="komiks_31"></div><div id="komiks_32"></div><div id="komiks_33"></div><div id="komiks_34"></div><div id="komiks_35"></div><div id="komiks_36"></div><div id="komiks_37"></div><div id="komiks_38"></div><div id="komiks_39"></div><div id="komiks_40"></div><div id="komiks_41"></div><div id="komiks_42"></div><div id="komiks_43"></div><div id="komiks_44"></div><div id="komiks_45"></div><div id="komiks_46"></div><div id="komiks_47"></div><div id="komiks_48"></div><div id="komiks_49"></div><div id="komiks_50"></div><div id="komiks_51"></div><div id="komiks_52"></div><div id="komiks_53"></div><div id="komiks_54"></div><div id="komiks_55"></div><div id="komiks_56"></div><div id="komiks_57"></div><div id="komiks_58"></div><div id="komiks_59"></div><div id="komiks_60"></div><div id="komiks_61"></div><div id="komiks_62"></div><div id="komiks_63"></div><div id="komiks_64"></div><div id="komiks_65"></div><div id="komiks_66"></div><div id="komiks_67"></div><div id="komiks_68"></div><div id="komiks_69"></div><div id="komiks_70"></div><div id="komiks_71"></div><div id="komiks_72"></div><div id="komiks_73"></div><div id="komiks_74"></div><div id="komiks_75"></div><div id="komiks_76"></div><div id="komiks_77"></div><div id="komiks_78"></div><div id="komiks_79"></div><div id="komiks_80"></div><div id="komiks_81"></div><div id="komiks_82"></div><div id="komiks_83"></div><div id="komiks_84"></div><div id="komiks_85"></div><div id="komiks_86"></div><div id="komiks_87"></div><div id="komiks_88"></div><div id="komiks_89"></div><div id="komiks_90"></div><div id="komiks_91"></div><div id="komiks_92"></div><div id="komiks_93"></div><div id="komiks_94"></div><div id="komiks_95"></div><div id="komiks_96"></div><div id="komiks_97"></div><div id="komiks_98"></div><div id="komiks_99"></div><div id="komiks_100"></div><div id="komiks_101"></div><div id="komiks_102"></div><div id="komiks_103"></div><div id="komiks_104"></div><div id="komiks_105"></div><div id="komiks_106"></div><div id="komiks_107"></div><div id="komiks_108"></div><div id="komiks_109"></div><div id="komiks_110"></div><div id="komiks_111"></div><div id="komiks_112"></div><div id="komiks_113"></div><div id="komiks_114"></div><div id="komiks_115"></div><div id="komiks_116"></div><div id="komiks_117"></div><div id="komiks_118"></div><div id="komiks_119"></div><div id="komiks_120"></div><div id="komiks_121"></div><div id="komiks_122"></div><div id="komiks_123"></div><div id="komiks_124"></div><div id="komiks_125"></div><div id="komiks_126"></div><div id="komiks_127"></div><div id="komiks_128"></div><div id="komiks_129"></div><div id="komiks_130"></div><div id="komiks_131"></div><div id="komiks_132"></div><div id="komiks_133"></div><div id="komiks_134"></div><div id="komiks_135"></div><div id="komiks_136"></div><div id="komiks_137"></div><div id="komiks_138"></div><div id="komiks_139"></div><div id="komiks_140"></div><div id="komiks_141"></div><div id="komiks_142"></div><div id="komiks_143"></div><div id="komiks_144"></div><div id="komiks_145"></div><div id="komiks_146"></div><div id="komiks_147"></div><div id="komiks_148"></div><div id="komiks_149"></div><div id="komiks_150"></div><div id="komiks_151"></div><div id="komiks_152"></div><div id="komiks_153"></div><div id="komiks_154"></div><div id="komiks_155"></div><div id="komiks_156"></div><div id="komiks_157"></div><div id="komiks_158"></div><div id="komiks_159"></div><div id="komiks_160"></div><div id="komiks_161"></div><div id="komiks_162"></div><div id="komiks_163"></div><div id="komiks_164"></div><div id="komiks_165"></div><div id="komiks_166"></div><div id="komiks_167"></div><div id="komiks_168"></div><div id="komiks_169"></div><div id="komiks_170"></div><div id="komiks_171"></div><div id="komiks_172"></div><div id="komiks_173"></div><div id="komiks_174"></div><div id="komiks_175"></div><div id="komiks_176"></div><div id="komiks_177"></div><div id="komiks_178"></div><div id="komiks_179"></div><div id="komiks_180"></div><div id="komiks_181"></div><div id="komiks_182"></div><div id="komiks_183"></div><div id="komiks_184"></div><div id="komiks_185"></div><div id="komiks_186"></div><div id="komiks_187"></div><div id="komiks_188"></div><div id="komiks_189"></div><div id="komiks_190"></div><div id="komiks_191"></div><div id="komiks_192"></div><div id="komiks_193"></div><div id="komiks_194"></div><div id="komiks_195"></div><div id="komiks_196"></div><div id="komiks_197"></div><div id="komiks_198"></div><div id="komiks_199"></div><div id="komiks_200"></div><div id="komiks_201"></div><div id="komiks_202"></div><div id="komiks_203"></div><div id="komiks_204"></div><div id="komiks_205"></div><div id="komiks_206"></div><div id="komiks_207"></div><div id="komiks_208"></div><div id="komiks_209"></div><div id="komiks_210"></div><div id="komiks_211"></div><div id="komiks_212"></div><div id="komiks_213"></div><div id="komiks_214"></div><div id="komiks_215"></div><div id="komiks_216"></div><div id="komiks_217"></div><div id="komiks_218"></div><div id="komiks_219"></div><div id="komiks_220"></div><div id="komiks_221"></div><div id="komiks_222"></div><div id="komiks_223"></div><div id="komiks_224"></div><div id="komiks_225"></div><div id="komiks_226"></div><div id="komiks_227"></div><div id="komiks_228"></div><div id="komiks_229"></div><div id="komiks_230"></div><div id="komiks_231"></div><div id="komiks_232"></div><div id="komiks_233"></div><div id="komiks_234"></div><div id="komiks_235"></div><div id="komiks_236"></div><div id="komiks_237"></div><div id="komiks_238"></div><div id="komiks_239"></div><div id="komiks_240"></div><div id="komiks_241"></div><div id="komiks_242"></div><div id="komiks_243"></div><div id="komiks_244"></div><div id="komiks_245"></div><div id="komiks_246"></div><div id="komiks_247"></div><div id="komiks_248"></div><div id="komiks_249"></div><div id="komiks_250"></div><div id="komiks_251"></div><div id="komiks_252"></div><div id="komiks_253"></div><div id="komiks_254"></div><div id="komiks_255"></div><div id="komiks_256"></div><div id="komiks_257"></div><div id="komiks_258"></div><div id="komiks_259"></div><div id="komiks_260"></div><div id="komiks_261"></div><div id="komiks_262"></div><div id="komiks_263"></div><div id="komiks_264"></div><div id="komiks_265"></div><div id="komiks_266"></div><div id="komiks_267"></div><div id="komiks_268"></div><div id="komiks_269"></div><div id="komiks_270"></div><div id="komiks_271"></div><div id="komiks_272"></div><div id="komiks_273"></div><div id="komiks_274"></div><div id="komiks_275"></div><div id="komiks_276"></div><div id="komiks_277"></div><div id="komiks_278"></div><div id="komiks_279"></div><div id="komiks_280"></div><div id="komiks_281"></div><div id="komiks_282"></div><div id="komiks_283"></div><div id="komiks_284"></div><div id="komiks_285"></div><div id="komiks_286"></div><div id="komiks_287"></div><div id="komiks_288"></div><div id="komiks_289"></div><div id="komiks_290"></div><div id="komiks_291"></div><div id="komiks_292"></div><div id="komiks_293"></div><div id="komiks_294"></div><div id="komiks_295"></div><div id="komiks_296"></div><div id="komiks_297"></div><div id="komiks_298"></div><div id="komiks_299"></div>
 			
-			
 			<div data-role="popup" id="obrazek_0"></div><div data-role="popup" id="obrazek_1"></div><div data-role="popup" id="obrazek_2"></div><div data-role="popup" id="obrazek_3"></div><div data-role="popup" id="obrazek_4"></div><div data-role="popup" id="obrazek_5"></div><div data-role="popup" id="obrazek_6"></div><div data-role="popup" id="obrazek_7"></div><div data-role="popup" id="obrazek_8"></div><div data-role="popup" id="obrazek_9"></div><div data-role="popup" id="obrazek_10"></div><div data-role="popup" id="obrazek_11"></div><div data-role="popup" id="obrazek_12"></div><div data-role="popup" id="obrazek_13"></div><div data-role="popup" id="obrazek_14"></div><div data-role="popup" id="obrazek_15"></div><div data-role="popup" id="obrazek_16"></div><div data-role="popup" id="obrazek_17"></div><div data-role="popup" id="obrazek_18"></div><div data-role="popup" id="obrazek_19"></div><div data-role="popup" id="obrazek_20"></div><div data-role="popup" id="obrazek_21"></div><div data-role="popup" id="obrazek_22"></div><div data-role="popup" id="obrazek_23"></div><div data-role="popup" id="obrazek_24"></div><div data-role="popup" id="obrazek_25"></div><div data-role="popup" id="obrazek_26"></div><div data-role="popup" id="obrazek_27"></div><div data-role="popup" id="obrazek_28"></div><div data-role="popup" id="obrazek_29"></div><div data-role="popup" id="obrazek_30"></div><div data-role="popup" id="obrazek_31"></div><div data-role="popup" id="obrazek_32"></div><div data-role="popup" id="obrazek_33"></div><div data-role="popup" id="obrazek_34"></div><div data-role="popup" id="obrazek_35"></div><div data-role="popup" id="obrazek_36"></div><div data-role="popup" id="obrazek_37"></div><div data-role="popup" id="obrazek_38"></div><div data-role="popup" id="obrazek_39"></div><div data-role="popup" id="obrazek_40"></div><div data-role="popup" id="obrazek_41"></div><div data-role="popup" id="obrazek_42"></div><div data-role="popup" id="obrazek_43"></div><div data-role="popup" id="obrazek_44"></div><div data-role="popup" id="obrazek_45"></div><div data-role="popup" id="obrazek_46"></div><div data-role="popup" id="obrazek_47"></div><div data-role="popup" id="obrazek_48"></div><div data-role="popup" id="obrazek_49"></div><div data-role="popup" id="obrazek_50"></div><div data-role="popup" id="obrazek_51"></div><div data-role="popup" id="obrazek_52"></div><div data-role="popup" id="obrazek_53"></div><div data-role="popup" id="obrazek_54"></div><div data-role="popup" id="obrazek_55"></div><div data-role="popup" id="obrazek_56"></div><div data-role="popup" id="obrazek_57"></div><div data-role="popup" id="obrazek_58"></div><div data-role="popup" id="obrazek_59"></div><div data-role="popup" id="obrazek_60"></div><div data-role="popup" id="obrazek_61"></div><div data-role="popup" id="obrazek_62"></div><div data-role="popup" id="obrazek_63"></div><div data-role="popup" id="obrazek_64"></div><div data-role="popup" id="obrazek_65"></div><div data-role="popup" id="obrazek_66"></div><div data-role="popup" id="obrazek_67"></div><div data-role="popup" id="obrazek_68"></div><div data-role="popup" id="obrazek_69"></div><div data-role="popup" id="obrazek_70"></div><div data-role="popup" id="obrazek_71"></div><div data-role="popup" id="obrazek_72"></div><div data-role="popup" id="obrazek_73"></div><div data-role="popup" id="obrazek_74"></div><div data-role="popup" id="obrazek_75"></div><div data-role="popup" id="obrazek_76"></div><div data-role="popup" id="obrazek_77"></div><div data-role="popup" id="obrazek_78"></div><div data-role="popup" id="obrazek_79"></div><div data-role="popup" id="obrazek_80"></div><div data-role="popup" id="obrazek_81"></div><div data-role="popup" id="obrazek_82"></div><div data-role="popup" id="obrazek_83"></div><div data-role="popup" id="obrazek_84"></div><div data-role="popup" id="obrazek_85"></div><div data-role="popup" id="obrazek_86"></div><div data-role="popup" id="obrazek_87"></div><div data-role="popup" id="obrazek_88"></div><div data-role="popup" id="obrazek_89"></div><div data-role="popup" id="obrazek_90"></div><div data-role="popup" id="obrazek_91"></div><div data-role="popup" id="obrazek_92"></div><div data-role="popup" id="obrazek_93"></div><div data-role="popup" id="obrazek_94"></div><div data-role="popup" id="obrazek_95"></div><div data-role="popup" id="obrazek_96"></div><div data-role="popup" id="obrazek_97"></div><div data-role="popup" id="obrazek_98"></div><div data-role="popup" id="obrazek_99"></div><div data-role="popup" id="obrazek_100"></div><div data-role="popup" id="obrazek_101"></div><div data-role="popup" id="obrazek_102"></div><div data-role="popup" id="obrazek_103"></div><div data-role="popup" id="obrazek_104"></div><div data-role="popup" id="obrazek_105"></div><div data-role="popup" id="obrazek_106"></div><div data-role="popup" id="obrazek_107"></div><div data-role="popup" id="obrazek_108"></div><div data-role="popup" id="obrazek_109"></div><div data-role="popup" id="obrazek_110"></div><div data-role="popup" id="obrazek_111"></div><div data-role="popup" id="obrazek_112"></div><div data-role="popup" id="obrazek_113"></div><div data-role="popup" id="obrazek_114"></div><div data-role="popup" id="obrazek_115"></div><div data-role="popup" id="obrazek_116"></div><div data-role="popup" id="obrazek_117"></div><div data-role="popup" id="obrazek_118"></div><div data-role="popup" id="obrazek_119"></div><div data-role="popup" id="obrazek_120"></div><div data-role="popup" id="obrazek_121"></div><div data-role="popup" id="obrazek_122"></div><div data-role="popup" id="obrazek_123"></div><div data-role="popup" id="obrazek_124"></div><div data-role="popup" id="obrazek_125"></div><div data-role="popup" id="obrazek_126"></div><div data-role="popup" id="obrazek_127"></div><div data-role="popup" id="obrazek_128"></div><div data-role="popup" id="obrazek_129"></div><div data-role="popup" id="obrazek_130"></div><div data-role="popup" id="obrazek_131"></div><div data-role="popup" id="obrazek_132"></div><div data-role="popup" id="obrazek_133"></div><div data-role="popup" id="obrazek_134"></div><div data-role="popup" id="obrazek_135"></div><div data-role="popup" id="obrazek_136"></div><div data-role="popup" id="obrazek_137"></div><div data-role="popup" id="obrazek_138"></div><div data-role="popup" id="obrazek_139"></div><div data-role="popup" id="obrazek_140"></div><div data-role="popup" id="obrazek_141"></div><div data-role="popup" id="obrazek_142"></div><div data-role="popup" id="obrazek_143"></div><div data-role="popup" id="obrazek_144"></div><div data-role="popup" id="obrazek_145"></div><div data-role="popup" id="obrazek_146"></div><div data-role="popup" id="obrazek_147"></div><div data-role="popup" id="obrazek_148"></div><div data-role="popup" id="obrazek_149"></div><div data-role="popup" id="obrazek_150"></div><div data-role="popup" id="obrazek_151"></div><div data-role="popup" id="obrazek_152"></div><div data-role="popup" id="obrazek_153"></div><div data-role="popup" id="obrazek_154"></div><div data-role="popup" id="obrazek_155"></div><div data-role="popup" id="obrazek_156"></div><div data-role="popup" id="obrazek_157"></div><div data-role="popup" id="obrazek_158"></div><div data-role="popup" id="obrazek_159"></div><div data-role="popup" id="obrazek_160"></div><div data-role="popup" id="obrazek_161"></div><div data-role="popup" id="obrazek_162"></div><div data-role="popup" id="obrazek_163"></div><div data-role="popup" id="obrazek_164"></div><div data-role="popup" id="obrazek_165"></div><div data-role="popup" id="obrazek_166"></div><div data-role="popup" id="obrazek_167"></div><div data-role="popup" id="obrazek_168"></div><div data-role="popup" id="obrazek_169"></div><div data-role="popup" id="obrazek_170"></div><div data-role="popup" id="obrazek_171"></div><div data-role="popup" id="obrazek_172"></div><div data-role="popup" id="obrazek_173"></div><div data-role="popup" id="obrazek_174"></div><div data-role="popup" id="obrazek_175"></div><div data-role="popup" id="obrazek_176"></div><div data-role="popup" id="obrazek_177"></div><div data-role="popup" id="obrazek_178"></div><div data-role="popup" id="obrazek_179"></div><div data-role="popup" id="obrazek_180"></div><div data-role="popup" id="obrazek_181"></div><div data-role="popup" id="obrazek_182"></div><div data-role="popup" id="obrazek_183"></div><div data-role="popup" id="obrazek_184"></div><div data-role="popup" id="obrazek_185"></div><div data-role="popup" id="obrazek_186"></div><div data-role="popup" id="obrazek_187"></div><div data-role="popup" id="obrazek_188"></div><div data-role="popup" id="obrazek_189"></div><div data-role="popup" id="obrazek_190"></div><div data-role="popup" id="obrazek_191"></div><div data-role="popup" id="obrazek_192"></div><div data-role="popup" id="obrazek_193"></div><div data-role="popup" id="obrazek_194"></div><div data-role="popup" id="obrazek_195"></div><div data-role="popup" id="obrazek_196"></div><div data-role="popup" id="obrazek_197"></div><div data-role="popup" id="obrazek_198"></div><div data-role="popup" id="obrazek_199"></div><div data-role="popup" id="obrazek_200"></div><div data-role="popup" id="obrazek_201"></div><div data-role="popup" id="obrazek_202"></div><div data-role="popup" id="obrazek_203"></div><div data-role="popup" id="obrazek_204"></div><div data-role="popup" id="obrazek_205"></div><div data-role="popup" id="obrazek_206"></div><div data-role="popup" id="obrazek_207"></div><div data-role="popup" id="obrazek_208"></div><div data-role="popup" id="obrazek_209"></div><div data-role="popup" id="obrazek_210"></div><div data-role="popup" id="obrazek_211"></div><div data-role="popup" id="obrazek_212"></div><div data-role="popup" id="obrazek_213"></div><div data-role="popup" id="obrazek_214"></div><div data-role="popup" id="obrazek_215"></div><div data-role="popup" id="obrazek_216"></div><div data-role="popup" id="obrazek_217"></div><div data-role="popup" id="obrazek_218"></div><div data-role="popup" id="obrazek_219"></div><div data-role="popup" id="obrazek_220"></div><div data-role="popup" id="obrazek_221"></div><div data-role="popup" id="obrazek_222"></div><div data-role="popup" id="obrazek_223"></div><div data-role="popup" id="obrazek_224"></div><div data-role="popup" id="obrazek_225"></div><div data-role="popup" id="obrazek_226"></div><div data-role="popup" id="obrazek_227"></div><div data-role="popup" id="obrazek_228"></div><div data-role="popup" id="obrazek_229"></div><div data-role="popup" id="obrazek_230"></div><div data-role="popup" id="obrazek_231"></div><div data-role="popup" id="obrazek_232"></div><div data-role="popup" id="obrazek_233"></div><div data-role="popup" id="obrazek_234"></div><div data-role="popup" id="obrazek_235"></div><div data-role="popup" id="obrazek_236"></div><div data-role="popup" id="obrazek_237"></div><div data-role="popup" id="obrazek_238"></div><div data-role="popup" id="obrazek_239"></div><div data-role="popup" id="obrazek_240"></div><div data-role="popup" id="obrazek_241"></div><div data-role="popup" id="obrazek_242"></div><div data-role="popup" id="obrazek_243"></div><div data-role="popup" id="obrazek_244"></div><div data-role="popup" id="obrazek_245"></div><div data-role="popup" id="obrazek_246"></div><div data-role="popup" id="obrazek_247"></div><div data-role="popup" id="obrazek_248"></div><div data-role="popup" id="obrazek_249"></div><div data-role="popup" id="obrazek_250"></div><div data-role="popup" id="obrazek_251"></div><div data-role="popup" id="obrazek_252"></div><div data-role="popup" id="obrazek_253"></div><div data-role="popup" id="obrazek_254"></div><div data-role="popup" id="obrazek_255"></div><div data-role="popup" id="obrazek_256"></div><div data-role="popup" id="obrazek_257"></div><div data-role="popup" id="obrazek_258"></div><div data-role="popup" id="obrazek_259"></div><div data-role="popup" id="obrazek_260"></div><div data-role="popup" id="obrazek_261"></div><div data-role="popup" id="obrazek_262"></div><div data-role="popup" id="obrazek_263"></div><div data-role="popup" id="obrazek_264"></div><div data-role="popup" id="obrazek_265"></div><div data-role="popup" id="obrazek_266"></div><div data-role="popup" id="obrazek_267"></div><div data-role="popup" id="obrazek_268"></div><div data-role="popup" id="obrazek_269"></div><div data-role="popup" id="obrazek_270"></div><div data-role="popup" id="obrazek_271"></div><div data-role="popup" id="obrazek_272"></div><div data-role="popup" id="obrazek_273"></div><div data-role="popup" id="obrazek_274"></div><div data-role="popup" id="obrazek_275"></div><div data-role="popup" id="obrazek_276"></div><div data-role="popup" id="obrazek_277"></div><div data-role="popup" id="obrazek_278"></div><div data-role="popup" id="obrazek_279"></div><div data-role="popup" id="obrazek_280"></div><div data-role="popup" id="obrazek_281"></div><div data-role="popup" id="obrazek_282"></div><div data-role="popup" id="obrazek_283"></div><div data-role="popup" id="obrazek_284"></div><div data-role="popup" id="obrazek_285"></div><div data-role="popup" id="obrazek_286"></div><div data-role="popup" id="obrazek_287"></div><div data-role="popup" id="obrazek_288"></div><div data-role="popup" id="obrazek_289"></div><div data-role="popup" id="obrazek_290"></div><div data-role="popup" id="obrazek_291"></div><div data-role="popup" id="obrazek_292"></div><div data-role="popup" id="obrazek_293"></div><div data-role="popup" id="obrazek_294"></div><div data-role="popup" id="obrazek_295"></div><div data-role="popup" id="obrazek_296"></div><div data-role="popup" id="obrazek_297"></div><div data-role="popup" id="obrazek_298"></div><div data-role="popup" id="obrazek_299"></div>
-
-
 			
 			</p>
 		  </div>
@@ -264,8 +217,6 @@
 			<button class="ui-btn ui-icon-mail ui-btn-icon-left ui-btn-right" onclick="raport()">Wyślij raport</button>
 		  </div> 
 		</div> 
-		
-	
 		
 	</body>
 </html>

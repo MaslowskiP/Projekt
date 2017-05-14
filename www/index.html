@@ -112,11 +112,11 @@
 				tx.executeSql('DROP TABLE IF EXISTS COMICS');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
 				$('#lista').html("TEST3");
-							var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
-			var zawartosc;
-			var kod;
-			$('#lista').html(lista);
-			$.getJSON(lista , function(jd2) {
+				var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
+				var zawartosc;
+				var kod;
+					$('#lista').html(lista);
+				$.getJSON(lista , function(jd2) {
 			
 				zawartosc = jd2.query.results.body;
 				zawartosc = zawartosc.split('\n');
@@ -125,7 +125,7 @@
 				for (i = 0; i < zawartosc.length; i++) {
 					kod = zawartosc[i].split(';');
 					dodaj (kod[0], kod[1], i);
-					
+						$('#lista').html(kod[0]);
 						tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
 
 					}

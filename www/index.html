@@ -143,25 +143,26 @@
 						for (y = 0; y < dlugosc; y++){
 							uszkodzone = uszkodzone + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
 						}
-						var gotowyEmail = 'Znaleziono następujące produkty:<br><br>' + odnalezione + '<br>Produkty które nie zostały znalezione:<br><br>' + nieodnalezione + '<br>Produkty które się skończyły:<br><br>' + ostatnie + '<br>Produkty uszkodzone:<br><br>' + uszkodzone + '<br>Wygenerowano aplikacją ATOM';//musi być w tym miejscu
-						//$('#lista').append(gotowyEmail); // do testów
-						//$('#lista').html("test"); // do testów	
+						var gotowyEmail = 'Znaleziono następujące produkty:<br><br>' + odnalezione + '<br>Produkty które nie zostały znalezione:<br><br>' + nieodnalezione + '<br>Produkty które się skończyły:<br><br>' + ostatnie + '<br>Produkty uszkodzone:<br><br>' + uszkodzone + '<br>Wygenerowano aplikacją ATOM';//musi być w tym miejscu inaczej nie ma synchronizacji
+	
+						//czyszczenie bazy danych oraz listy komiksów
+						
+						tx.executeSql('DROP TABLE IF EXISTS COMICS'); // usuwa tabelę
+						for (k = 0; k<300; k++) {
+							$("#komiks_" + k).html("");
+						}
+						
 						//tworzenie wiadomości mailowej
 						cordova.plugins.email.open({
-						app: 	'gmail',
-						to:      'sklep@atomcomics.pl',
-						subject: 'Raport magazynowy z ' + dzis,
-						body:    gotowyEmail
-				});
+							app: 	'gmail',
+							to:      'sklep@atomcomics.pl',
+							subject: 'Raport magazynowy z ' + dzis,
+							body:    gotowyEmail
+						});
 					}, null);
-					
-
-				
-				
+			
 				});
-
-			
-			
+	
 			}
 			
 			

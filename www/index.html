@@ -64,7 +64,6 @@
 			
 			$(document).ready(function() {
 				$("#zaczytaj").click(function(event){
-				$('#lista').html("TEST");
 				pobierzListe();
 				});
 
@@ -108,14 +107,13 @@
 			
 			//najpierw obsługa bazy danych - usuwa tabelę a następnie ją tworzy (poprostu czyści tabelę ze starej listy produktów)
 			db.transaction(function (tx) {
-				$('#lista').html("TEST2");
+
 				tx.executeSql('DROP TABLE IF EXISTS COMICS');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
-				$('#lista').html("TEST3");
+
 				var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
 				var zawartosc;
 				var kod;
-					$('#lista').html(lista);
 				$.getJSON(lista , function(jd2) {
 			
 				zawartosc = jd2.query.results.body;
@@ -125,7 +123,6 @@
 				for (i = 0; i < zawartosc.length; i++) {
 					kod = zawartosc[i].split(';');
 					dodaj (kod[0], kod[1], i);
-						$('#lista').html(kod[0]);
 						tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
 
 					}
@@ -149,7 +146,7 @@
 			var link = "https://query.yahooapis.com/v1/public/yql?q=select+src+from+html+where+url%3D%22https%3A%2F%2Fpreviewsworld.com%2FCatalog%2F"+kod+"%22+and%0A++++++xpath%3D%27%2F%2Fdiv%2Fa%2Fimg%27+LIMIT+1&format=json";
 			   
 			$.getJSON(link, function(jd) {
-                  $('#obrazek_' + num).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd.query.results.img.src+'" style="width:400px;height:600px;" alt="'+kod+'">');
+                  $('#obrazek_' + num).html('<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><img src="https://www.previewsworld.com'+jd.query.results.img.src+'" style="width:300px;height:400px;" alt="'+kod+'">');
                }); //dodawanie obrazka
 			
 			

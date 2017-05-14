@@ -75,10 +75,12 @@
 					wynik = wynik.split('&');
 					var wiadomosc = wynik[0].split("=").pop();
 					var numer = wynik[1].split("=").pop();
+					var test = parseInt(numer); //id produktu
+					var test2 = parseInt(wiadomosc); //status
 					//$('#lista').html(wiadomosc +"bang" + numer);
 					$("#komiks_" + numer).html("");
-					usun(numer);
-					//$("#wiadomosc").html("");//usuwa okno
+					kasuj(test, test2);
+					$("#wiadomosc").html("");//usuwa okno
 				});
 			});
 			

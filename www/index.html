@@ -34,6 +34,11 @@
 
 
 			
+			document.addEventListener('deviceready', function () {
+				// cordova.plugins.email is now available
+			}, false);
+			
+			
 			var db = openDatabase('comiclist', '1.0', 'Baza z produktami', 2 * 1024 * 1024);
 			
 			db.transaction(function (tx) {
@@ -69,11 +74,19 @@
 
 			});
 			
+
+			function raport() {
+				cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');
+				cordova.plugins.email.open({
+					app: 'gmail',
+					to:      'ziem94@gmail.com',
+					subject: 'Testowanie działania emaila',
+					body:    'Tutaj będzie cała wiadomość z raportem'
+				});
 			
 			
+			}
 			
-			//$('#lista').html("<br />$('form').serialize():<br />"+ $('form').serialize());
-			//var data = $('form').serialize();
 			
 			function kasuj(numer, wiadomosc) {
 			
@@ -111,27 +124,27 @@
 				tx.executeSql('DROP TABLE IF EXISTS COMICS');
 				tx.executeSql('CREATE TABLE IF NOT EXISTS COMICS (id unique, name, code, status)');
 
-				var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
-				var zawartosc;
-				var kod;
-				$.getJSON(lista , function(jd2) {
-			
-				zawartosc = jd2.query.results.body;
-				zawartosc = zawartosc.split('\n');
-				
-				db.transaction(function (tx) {	// funkcja z bazą danych musi się zaczynać tutaj bo inaczej nie działa patrz tutaj: http://stackoverflow.com/questions/12586367/only-the-last-run-in-a-for-loop-in-javascript-works
-				for (i = 0; i < zawartosc.length; i++) {
-					kod = zawartosc[i].split(';');
-					dodaj (kod[0], kod[1], i);
-						tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
-
-					}
-				});
-			});
 
     });
 			//reszta funkcji pobierająca liste komiksów
 			
+			var lista = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22http%3A%2F%2Fwizard.uek.krakow.pl%2F~s181008%2Flista2.txt%22%20&format=json&diagnostics=true&callback=';
+			var zawartosc;
+			var kod;
+			$.getJSON(lista , function(jd2) {
+			
+			zawartosc = jd2.query.results.body;
+			zawartosc = zawartosc.split('\n');
+				
+			db.transaction(function (tx) {	// funkcja z bazą danych musi się zaczynać tutaj bo inaczej nie działa patrz tutaj: http://stackoverflow.com/questions/12586367/only-the-last-run-in-a-for-loop-in-javascript-works
+			for (i = 0; i < zawartosc.length; i++) {
+				kod = zawartosc[i].split(';');
+				dodaj (kod[0], kod[1], i);
+					tx.executeSql('INSERT INTO COMICS (id, name, code, status) VALUES (?, ?, ?, 0)', [i, kod[0], kod[1]] ); //dodaje nowy wpis do bazy danych
+
+					}
+				});
+			});
 
 			
 			}
@@ -150,10 +163,9 @@
                }); //dodawanie obrazka
 			
 			
-			$('#komiks_' + num).html(nazwa + ' <a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a>  <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+',0)">Brak</button><button class="ui-btn ui-icon-shop ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 2)">Ostatni</button><button class="ui-btn ui-icon-alert ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 3)">Uszkodzony</button><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Znaleziono</button><hr>'); //dodawanie komiksu
+			$('#komiks_' + num).html(nazwa + ' <a href="#obrazek_'+num+'" data-rel="popup" data-position-to="window" class="ui-btn ui-icon-camera ui-btn-icon-left ui-btn-inline" >Zdjęcie</a>  <button class="ui-btn ui-icon-delete ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+',0)">Brak</button><button class="ui-btn ui-icon-shop ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="kasuj('+num+', 2)">Ostatni</button><button class="ui-btn ui-icon-alert ui-btn-icon-left  ui-btn-inline" onclick="kasuj('+num+', 3)">Uszkodzony</button><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left ui-icon-check ui-btn-inline" onclick="usun('+num+')">Znaleziono</button><hr>'); //dodawanie komiksu
 			
-			$('#wiadomosc_' + num).html('<a href="#pageone" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn ui-icon-delete ui-btn-icon-notext ui-btn-right">Zamknij</a><form method="post" id="form"><label for="message">Wybierz komentarz</label><select name="message" id="message"><option value="2">Ostatnia sztuka produktu</option><option value="1">Brak produktu</option><option value="3">Produkt uszkodzony</option></select><input type="hidden" name="nr" value="'+num+'"><input type="submit" data-inline="true" value="Dodaj komentarz"></form>');// dodaje boxa z komentarzem
-			
+		
 
 			}
 
@@ -169,8 +181,9 @@
 			</p>
 		  </div>
 		  <div data-role="footer" data-position="fixed">
-			<!-- <h1>(c) Piotr Masłowski, Adrian Myszor</h1> --><button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" id="zaczytaj">Zaczytaj listę</button>
-			<button class="ui-btn ui-icon-mail ui-btn-icon-left ui-btn-right">Wyślij raport</button>
+			<!-- <h1>(c) Piotr Masłowski, Adrian Myszor</h1> -->
+			<button class="ui-btn ui-icon-arrow-d ui-btn-icon-left" id="zaczytaj">Zaczytaj listę</button>
+			<button class="ui-btn ui-icon-mail ui-btn-icon-left ui-btn-right" onclick="raport()">Wyślij raport</button>
 		  </div> 
 		</div> 
 		

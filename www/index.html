@@ -76,7 +76,7 @@
 			
 
 			function raport() {
-				cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');//dodanie allisu bez tego nie można używać gmaila
+				//cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');//dodanie allisu bez tego nie można używać gmaila
 				//zmienne potrzebne do tworzenia maila
 				//pobieranie dzisiejszej daty
 				var dzis = new Date();
@@ -91,62 +91,73 @@
 				if(mm<10) {
 					mm='0'+mm
 				} 
-
+			
 				dzis = dd+'.'+mm+'.'+yyyy; //gotowa dzisiejsza data
-				//tworzenie raportu na podstawie bazy danych najpierw komiksy/produkty znalezione
-				var odnalezione;
+				
+				var odnalezione = '';
+				var nieodnalezione = '';
+				var ostatnie = ''; 
+				var uszkodzone = '';
+				
 				db.transaction(function (tx) {
+				//tworzenie raportu na podstawie bazy danych najpierw komiksy/produkty znalezione
+				
+				
 		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=1', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							odnalezione = odnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'\n';
+							odnalezione = odnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
 						}
 					}, null);
-				});
+				
 				//teraz zbieranie wszystkich komiksów nie znalezionych
-				var nieodnalezione;
-				db.transaction(function (tx) {
+
 		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=0', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
-					
+						
 						for (y = 0; y < dlugosc; y++){
-							nieodnalezione = nieodnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'\n';
+							nieodnalezione = nieodnalezione + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
 						}
 					}, null);
-				});				
+			
 				//teraz zbieranie wszystkich ostatnich produktów 
-				var ostatnie;
-				db.transaction(function (tx) {
+
 		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=2', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							ostatnie = ostatnie + results.rows.item(y).name +'\t' + results.rows.item(y).code +'\n';
+							ostatnie = ostatnie + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
 						}
 					}, null);
-				});					
+					
 				//teraz wszystkie uszkodzone
-				var uszkodzone;
-				db.transaction(function (tx) {
+
 		 
 					tx.executeSql('SELECT * FROM COMICS WHERE status=3', [], function (tx, results) {
 						var dlugosc = results.rows.length, y;
 					
 						for (y = 0; y < dlugosc; y++){
-							uszkodzone = uszkodzone + results.rows.item(y).name +'\t' + results.rows.item(y).code +'\n';
+							uszkodzone = uszkodzone + results.rows.item(y).name +'\t' + results.rows.item(y).code +'<br>';
 						}
+						var gotowyEmail = 'Znaleziono następujące produkty:<br><br>' + odnalezione + '<br>Produkty które nie zostały znalezione:<br><br>' + nieodnalezione + '<br>Produkty które się skończyły:<br><br>' + ostatnie + '<br>Produkty uszkodzone:<br><br>' + uszkodzone + '<br>Wygenerowano aplikacją ATOM';//musi być w tym miejscu
+						//$('#lista').append(gotowyEmail); // do testów
 					}, null);
-				});	
+					
+
+				
+				
+				});
+					
 				//tworzenie wiadomości mailowej
 				cordova.plugins.email.open({
 					app: 	'gmail',
 					to:      'sklep@atomcomics.pl',
 					subject: 'Raport magazynowy z ' + dzis,
-					body:    'Znaleziono następujące produkty:\n\n' + odnalezione + '\nProdukty które nie zostały znalezione:\n\n' + nieodnalezione + '\nProdukty które się skończyły:\n\n' + ostatnie + '\nProdukty uszkodzone:\n\n' + uszkodzone + '\n\nWygenerowano aplikacją ATOM'
+					body:    gotowyEmail
 				});
 			
 			

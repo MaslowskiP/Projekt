@@ -14,7 +14,7 @@
 		<div data-role="page" id="pageone">
 			<div data-role="header">
 				<h1>Lista produktów</h1>
-			
+				<button onclick="cofnij()" class="ui-btn ui-corner-all ui-icon-back ui-btn-icon-notext">Cofnij</button>
 			</div>
 		<div data-role="main" class="ui-content">
 			<p>
@@ -23,6 +23,8 @@
 			document.addEventListener('deviceready', function () { //aktywuje plugin z mailami
 			}, false);
 
+			
+			var ostatniNumer;//w tej zmiennej będzie przechowywany numer ostatniego znalezionego produktu
 			var db = openDatabase('comiclist', '1.0', 'Baza z produktami', 2 * 1024 * 1024); //tworzenie bazy danych
 			
 			db.transaction(function (tx) {
@@ -50,6 +52,26 @@
 				pobierzListe();
 				});
 			});
+			
+			function cofnij() {//funkcja cofa ostatnio znaleziony produkt
+			
+			ostatniNumer = parseInt(ostatniNumer);
+			
+			db.transaction(function (tx) { 
+		 
+				tx.executeSql('SELECT * FROM COMICS WHERE id=?', [ostatniNumer], function (tx, results) {//zapytanie do bazy danych
+			
+				dodaj(results.rows.item(0).name, results.rows.item(0).code, results.rows.item(0).id)//wyswietlenie produktów
+				tx.executeSql('UPDATE COMICS SET status=0 WHERE id=?',  [ostatniNumer]);
+				ostatniNumer = '';
+            }, null);
+
+			});
+
+			
+			
+			}
+			
 			
 			function raport() {//funkcja report() - jej zadanie jest stworzenie raportu końcowego oraz stworzenie maila
 				cordova.plugins.email.addAlias('gmail', 'com.google.android.gm');//dodanie allisu bez tego nie można używać gmaila
@@ -139,6 +161,7 @@
 				$("#komiks_" + numer).html("");
 				var test = parseInt(numer); //id produktu
 				var test2 = parseInt(wiadomosc); //status
+				ostatniNumer = test;
 				db.transaction(function (tx) {
 			
 					tx.executeSql('UPDATE COMICS SET status=? WHERE id=?',  [test2, test]);
@@ -150,6 +173,7 @@
 			function usun(id) {//funkcja usuwa komiks po jego znalezieniu
 			
 				$("#komiks_" + id).html("");
+				ostatniNumer = id;
 				db.transaction(function (tx) {
 			
 					tx.executeSql('UPDATE COMICS SET status=1 WHERE id=?',  [id]);
